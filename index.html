@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Simple Map</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <style>
+        /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+
+        #map {
+            height: 100%;
+        }
+
+        /* Optional: Makes the sample page fill the window. */
+
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+    <script src=https://code.jquery.com/jquery-3.3.1.min.js></script>
+
+    <!-- 지도 설정(initMap) : 중앙 위치, 확대 등 -->
+    <!-- 지도에 마커 표시(marker) : position 위치에 마커 표시 -->
+    <script>
+        var map;
+        var markers = [];
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: -34.397, lng: 150.644 },
+                zoom: 1
+                /* zoom: 1: World
+                5: Landmass/continent
+                10: City
+                15: Streets
+                20: Buildings */
+            });
+
+            /* var marker = new google.maps.Marker({
+                map: map,
+                position: { lat: -34.397, lng: 150.644 },
+                title: 'Hello World!'
+            }); */
+
+            setInterval(timerCallback, 5000);
+        }
+
+        function timerCallback() {
+            console.log('setTimer is working');
+            getLogLat(function (obj) {
+                markers = [];
+                for (var i in obj) {
+                    // update marker in map
+                    updateMarker(obj[i]);
+                }
+            });
+        }
+
+        function updateMarker(poi) {
+            markers.push(new google.maps.Marker({
+                map: map,
+                position: { lat: poi[0], lng: poi[1] },
+                title: 'Hello World!'
+            }));
+        }
+
+        // Cross-Origin Resource Sharing 에러 = 서버IP와 페이지IP가 다르다
+        // url에 localhost일 때는 port를 붙여줬는데, 클라우드 url에는 port를 안붙인다.
+        function getLogLat(cb) {
+            var settings = {
+                type: 'GET',
+                url: 'https://locationcfc-180816-park.mybluemix.net/testcfc'
+            };
+
+            console.log("before ajax");
+
+            // data = text,json,object?
+            // ajax or websocket
+            $.ajax(settings).done(function (data) {
+                console.log('before console log data');
+                // console.log(data);
+                if (data == "initLocation") {
+                    markers = [];
+                }
+                if (data != "fail" && data != -1) {
+                    var obj = data;
+                    cb(obj);
+                }
+                else {
+                    return;
+                }
+            }).fail(function () {
+                console.log("ajax fail in index.html");
+            });
+
+            // 
+        }
+
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB3b25QdlpNi6oQme5RFq1rsHz6iGAC7go&callback=initMap" async
+        defer></script>
+</head>
+
+<body>
+
+    <!-- 지도가 보여지는 곳 -->
+    <div id="map"></div>
+
+</body>
+
+</html>

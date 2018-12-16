@@ -1,0 +1,4 @@
+---
+applications:
+- name: LocationCFC-180816-park
+  memory: 256M
